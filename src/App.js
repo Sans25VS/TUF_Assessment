@@ -1,25 +1,46 @@
-import logo from './logo.svg';
-import './App.css';
+// src/App.js
+import React, { useState, useEffect } from 'react';
+import Banner from './components/Banner';
+import Dashboard from './components/Dashboard';
+import axios from 'axios';
 
-function App() {
+const App = () => {
+  const [bannerData, setBannerData] = useState({
+    description: '',
+    link: '',
+    timer: 60,
+    isVisible: true,
+  });
+
+  const fetchBannerData = async () => {
+    const { data } = await axios.get('/api/banner');
+    setBannerData(data);
+  };
+
+  useEffect(() => {
+    fetchBannerData();
+  }, []);
+
+  const handleTimeUp = () => {
+    setBannerData({ ...bannerData, isVisible: false });
+  };
+
+  const updateBannerData = (newData) => {
+    setBannerData(newData);
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Banner
+        description={bannerData.description}
+        link={bannerData.link}
+        isVisible={bannerData.isVisible}
+        timer={bannerData.timer}
+        onTimeUp={handleTimeUp}
+      />
+      <Dashboard onBannerUpdate={updateBannerData} />
     </div>
   );
-}
+};
 
 export default App;
